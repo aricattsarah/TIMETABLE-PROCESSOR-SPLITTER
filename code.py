@@ -26,3 +26,26 @@ weekly_timetable = pd.concat(all_days_data, ignore_index=True)
 classes = weekly_timetable["Class"].unique()
 used_sheet_names = set()
 
+def get_unique_sheet_name(base_name):
+    name = base_name[:31]
+    original = name
+    i = 1
+    while name.lower() in used_sheet_names:
+        suffix = f"_{i}"
+        name = (original[:31 - len(suffix)] + suffix) if len(original) + len(suffix) > 31 else original + suffix
+        i += 1
+    used_sheet_names.add(name.lower())
+    return name
+
+with pd.ExcelWriter("Classwise_Timetable.xlsx", engine="xlsxwriter") as writer:
+    for cls in classes:
+        if pd.isna(cls):
+            continue
+        class_df = weekly_timetable[weekly_timetable["Class"] == cls].copy()
+        cols = ['Day'] + [col for col in class_df.columns if col not in ['Class', 'Day']]
+        class_df = class_df[cols]
+        sheet_name = get_unique_sheet_name(str(cls).strip())
+        class_df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+#Download the output files
+files.download("enter_name.xlsx")
