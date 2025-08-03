@@ -1,0 +1,2 @@
+--> this code can be used when the timetable of each day for all classes is given
+--> using the file that contain the given data to generate classwise timetable
